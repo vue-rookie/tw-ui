@@ -1,0 +1,47 @@
+{
+  "name": "tw-ui",
+  "version": "0.1.0",
+  "description": "A Vue 3 UI component library built with Tailwind CSS",
+  "type": "module",
+  "main": "dist/tw-ui.umd.js",
+  "module": "dist/tw-ui.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc -b && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
+  },
+  "keywords": [
+    "vue",
+    "vue3",
+    "component",
+    "ui",
+    "tailwind",
+    "tailwindcss"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "vue": "^3.2.0"
+  },
+  "devDependencies": {
+    "@headlessui/vue": "^1.7.23",
+    "@heroicons/vue": "^2.2.0",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
+    "autoprefixer": "^10.4.19",
+    "postcss": "^8.4.35",
+    "postcss-nesting": "^13.0.1",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.7.2",
+    "vite": "^6.2.0",
+    "vue-tsc": "^2.2.4"
+  },
+  "peerDependencies": {
+    "vue": "^3.2.0"
+  }
+}
