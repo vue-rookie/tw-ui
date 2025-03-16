@@ -5,7 +5,7 @@
 ## 安装
 
 ```bash
-npm install tw-ui
+npm install @malq/tw-ui
 ```
 
 ## 使用方法
