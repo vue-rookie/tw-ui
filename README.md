@@ -14,7 +14,7 @@
 ## 安装
 
 ```bash
-npm install tw-ui
+npm install @malq/tw-ui
 ```
 
 ## 使用
@@ -26,10 +26,9 @@ npm install tw-ui
 ```ts
 import { createApp } from 'vue'
 import App from './App.vue'
-import TwUI from 'tw-ui'
 // 重要：导入样式
-import 'tw-ui/dist/styles/index.css'
-
+import '@malq/tw-ui/dist/styles/index.css'
+import TwUI from '@malq/tw-ui'
 const app = createApp(App)
 app.use(TwUI)
 app.mount('#app')
@@ -43,9 +42,11 @@ app.mount('#app')
 </template>
 
 <script setup lang="ts">
-import { TwButton } from 'tw-ui'
+import { TwButton } from '@malq/tw-ui'
 // 重要：导入样式
-import 'tw-ui/dist/styles/index.css'
+import '@malq/tw-ui/dist/styles/index.css'
+import { TwButton } from '@malq/tw-ui'
+import 'tw-ui/dist/style.css'
 </script>
 ```
 
