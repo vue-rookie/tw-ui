@@ -30,6 +30,9 @@ import TwTextarea from './ui/Textarea.vue'
 import TwTooltip from './ui/Tooltip.vue'
 import TwUpload from './ui/Upload.vue'
 
+// Import styles - this is important for extracting CSS
+import '../styles/index.css'
+
 import type { App } from 'vue'
 
 // Export all components

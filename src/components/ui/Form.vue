@@ -12,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { provide, ref, reactive, computed, watch, onMounted } from 'vue'
+import { provide, reactive } from 'vue'
 import type { Ref } from 'vue'
 
 export type FormItemRule = {
@@ -84,7 +84,7 @@ const fields = reactive<FormItemContext[]>([])
 // 添加表单项
 const addField = (field: FormItemContext) => {
   if (field.prop) {
-    fields.push(field)
+    fields.push(field as any)
   }
 }
 
@@ -174,18 +174,31 @@ defineExpose({
 }
 
 .tw-form-horizontal {
-  @apply tw-space-y-4;
+  @apply tw-space-y-6;
 }
 
 .tw-form-vertical {
-  @apply tw-space-y-4;
+  @apply tw-space-y-6;
 }
 
 .tw-form-inline {
-  @apply tw-flex tw-flex-wrap tw-gap-4;
+  @apply tw-flex tw-flex-wrap tw-gap-6 tw-items-start;
 }
 
 .tw-form-disabled {
-  @apply tw-opacity-60 tw-pointer-events-none;
+  @apply tw-opacity-70 tw-pointer-events-none;
+  filter: grayscale(0.2);
+}
+
+/* 添加表单动画效果 */
+.tw-form-item-enter-active,
+.tw-form-item-leave-active {
+  transition: all 0.3s ease-out;
+}
+
+.tw-form-item-enter-from,
+.tw-form-item-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
 }
 </style> 

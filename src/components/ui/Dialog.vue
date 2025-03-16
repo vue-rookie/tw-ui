@@ -81,8 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount, nextTick } from 'vue'
-import { Teleport, Transition } from 'vue'
+import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 
 interface DialogProps {
   modelValue: boolean
@@ -337,6 +336,7 @@ defineExpose({
 <style scoped>
 .tw-dialog-overlay {
   @apply tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-overflow-auto;
+  backdrop-filter: blur(2px);
 }
 
 .tw-dialog-overlay-mask {
@@ -345,6 +345,7 @@ defineExpose({
 
 .tw-dialog {
   @apply tw-bg-white tw-rounded-lg tw-shadow-xl tw-flex tw-flex-col tw-relative tw-max-h-[90vh] tw-max-w-[90vw] tw-mx-auto;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 .tw-dialog-small {
@@ -369,6 +370,7 @@ defineExpose({
 
 .tw-dialog-header {
   @apply tw-flex tw-items-center tw-justify-between tw-px-6 tw-py-4 tw-border-b tw-border-gray-200;
+  background-color: rgba(249, 250, 251, 0.8);
 }
 
 .tw-dialog-title {
@@ -376,7 +378,7 @@ defineExpose({
 }
 
 .tw-dialog-close {
-  @apply tw-p-1 tw-rounded-full tw-text-gray-400 hover:tw-text-gray-500 focus:tw-outline-none;
+  @apply tw-p-1.5 tw-rounded-full tw-text-gray-400 hover:tw-text-gray-500 hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-ring-offset-2 tw-transition-colors;
 }
 
 .tw-dialog-body {
@@ -385,6 +387,7 @@ defineExpose({
 
 .tw-dialog-footer {
   @apply tw-flex tw-justify-end tw-px-6 tw-py-4 tw-border-t tw-border-gray-200;
+  background-color: rgba(249, 250, 251, 0.8);
 }
 
 /* 过渡动画 */
@@ -400,11 +403,11 @@ defineExpose({
 
 .tw-dialog-fade-enter-active .tw-dialog,
 .tw-dialog-fade-leave-active .tw-dialog {
-  @apply tw-transition-transform tw-duration-300 tw-ease-out;
+  @apply tw-transition-all tw-duration-300 tw-ease-out;
 }
 
 .tw-dialog-fade-enter-from .tw-dialog,
 .tw-dialog-fade-leave-to .tw-dialog {
-  @apply tw-transform tw-scale-95;
+  @apply tw-transform tw-scale-95 tw-opacity-0;
 }
 </style> 

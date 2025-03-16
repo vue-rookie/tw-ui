@@ -17,7 +17,6 @@ import {
   TwCheckbox,
   TwInput,
   TwModal,
-  TwOption,
   TwPagination,
   TwRadio,
   TwSelect,
@@ -44,9 +43,9 @@ const alertClosed = ref(false)
 // 标签页
 const activeTab = ref('tab1')
 const tabs = [
-  { label: '标签1', value: 'tab1' },
-  { label: '标签2', value: 'tab2' },
-  { label: '标签3', value: 'tab3' }
+  { label: '标签1', name: 'tab1' },
+  { label: '标签2', name: 'tab2' },
+  { label: '标签3', name: 'tab3' }
 ]
 
 // 模态框
@@ -73,10 +72,10 @@ const currentPage = ref(1)
         <TwButton variant="link">链接按钮</TwButton>
       </div>
       <div class="tw-flex tw-flex-wrap tw-gap-4 tw-mt-4">
-        <TwButton size="sm">小按钮</TwButton>
+        <TwButton size="small">小按钮</TwButton>
         <TwButton>中按钮</TwButton>
-        <TwButton size="lg">大按钮</TwButton>
-        <TwButton size="xl">超大按钮</TwButton>
+        <TwButton size="large">大按钮</TwButton>
+        <TwButton size="large">超大按钮</TwButton>
       </div>
     </section>
 
@@ -144,11 +143,15 @@ const currentPage = ref(1)
           
           <div>
             <label class="tw-block tw-text-sm tw-font-medium tw-mb-1">选择框</label>
-            <TwSelect v-model="selectValue" placeholder="请选择">
-              <TwOption value="option1" label="选项1" />
-              <TwOption value="option2" label="选项2" />
-              <TwOption value="option3" label="选项3" />
-            </TwSelect>
+            <TwSelect 
+              v-model="selectValue" 
+              placeholder="请选择"
+              :options="[
+                { label: '选项1', value: 'option1' },
+                { label: '选项2', value: 'option2' },
+                { label: '选项3', value: 'option3' }
+              ]"
+            />
           </div>
           
           <div>

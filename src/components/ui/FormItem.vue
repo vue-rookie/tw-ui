@@ -30,7 +30,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, inject, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
+import { ref, inject, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import type { FormContext, FormItemRule, FormItemValidateStatus, FormItemValidateResult } from './Form.vue'
 
 interface FormItemProps {
@@ -116,26 +116,26 @@ const validate = async (): Promise<FormItemValidateResult> => {
   try {
     for (const rule of rules) {
       // 必填验证
-      if (rule.required && (value === undefined || value === null || value === '')) {
+      if (rule.required && (value === undefined || value === null || value === '' as any)) {
         validateStatus.value = 'error'
         validateMessage.value = rule.message || `${props.label || props.prop}不能为空`
         return { status: 'error', message: validateMessage.value }
       }
       
       // 跳过空值的非必填验证
-      if ((value === undefined || value === null || value === '') && !rule.required) {
+      if ((value === undefined || value === null || value === '' as any) && !rule.required) {
         continue
       }
       
       // 最小长度验证
-      if (rule.min !== undefined && typeof value === 'string' && value.length < rule.min) {
+      if (rule.min !== undefined && typeof value === 'string' && (value as string).length < rule.min) {
         validateStatus.value = 'error'
         validateMessage.value = rule.message || `${props.label || props.prop}长度不能小于${rule.min}`
         return { status: 'error', message: validateMessage.value }
       }
       
       // 最大长度验证
-      if (rule.max !== undefined && typeof value === 'string' && value.length > rule.max) {
+      if (rule.max !== undefined && typeof value === 'string' && (value as string).length > rule.max) {
         validateStatus.value = 'error'
         validateMessage.value = rule.message || `${props.label || props.prop}长度不能大于${rule.max}`
         return { status: 'error', message: validateMessage.value }
@@ -266,7 +266,7 @@ defineExpose({
 }
 
 .tw-form-item-vertical .tw-form-item-label {
-  @apply tw-mb-1;
+  @apply tw-mb-1.5;
 }
 
 .tw-form-item-inline {
@@ -290,18 +290,50 @@ defineExpose({
 }
 
 .tw-form-item-error-message {
-  @apply tw-text-red-500 tw-text-xs tw-mt-1;
+  @apply tw-text-red-500 tw-text-xs tw-mt-1.5 tw-transition-all tw-duration-200 tw-ease-in-out;
+  animation: errorShake 0.5s ease-in-out;
+}
+
+@keyframes errorShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
 }
 
 .tw-form-item-error :deep(input),
 .tw-form-item-error :deep(select),
 .tw-form-item-error :deep(textarea) {
   @apply tw-border-red-500 focus:tw-ring-red-500 focus:tw-border-red-500;
+  box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
 }
 
 .tw-form-item-success :deep(input),
 .tw-form-item-success :deep(select),
 .tw-form-item-success :deep(textarea) {
   @apply tw-border-green-500 focus:tw-ring-green-500 focus:tw-border-green-500;
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
+}
+
+.tw-form-item-validating :deep(input),
+.tw-form-item-validating :deep(select),
+.tw-form-item-validating :deep(textarea) {
+  @apply tw-border-blue-500 focus:tw-ring-blue-500 focus:tw-border-blue-500;
+}
+
+/* 添加输入框焦点效果 */
+.tw-form-item :deep(input:focus),
+.tw-form-item :deep(select:focus),
+.tw-form-item :deep(textarea:focus) {
+  @apply tw-ring-2 tw-ring-offset-2 tw-ring-blue-500 tw-border-blue-500;
+  transition: all 0.2s ease-in-out;
+}
+
+/* 添加标签悬停效果 */
+.tw-form-item-label label {
+  @apply tw-transition-colors tw-duration-200;
+}
+
+.tw-form-item-label label:hover {
+  @apply tw-text-gray-900;
 }
 </style> 
