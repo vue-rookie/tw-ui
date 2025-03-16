@@ -1,6 +1,15 @@
-# TW UI
+# TW-UI 组件库
 
-一个基于 Vue 3 和 Tailwind CSS 构建的 UI 组件库。
+一个基于Vue 3和Tailwind CSS的现代化UI组件库。
+
+## 特性
+
+- 🚀 基于Vue 3和Tailwind CSS
+- 📦 丰富的组件集合
+- 🎨 可定制的主题
+- 📱 响应式设计
+- 🌐 国际化支持
+- ♿ 可访问性支持
 
 ## 安装
 
@@ -8,15 +17,18 @@
 npm install @malq/tw-ui
 ```
 
-## 使用方法
+## 使用
 
-### 全局注册
+### 全局引入
 
-```typescript
+在你的main.ts/js文件中：
+
+```ts
 import { createApp } from 'vue'
+import App from './App.vue'
+// 重要：导入样式
+import '@malq/tw-ui/dist/styles/index.css'
 import TwUI from '@malq/tw-ui'
-import 'tw-ui/dist/style.css'
-
 const app = createApp(App)
 app.use(TwUI)
 app.mount('#app')
@@ -26,67 +38,49 @@ app.mount('#app')
 
 ```vue
 <template>
-  <tw-button>点击我</tw-button>
+  <TwButton type="primary">按钮</TwButton>
 </template>
 
 <script setup lang="ts">
+import { TwButton } from '@malq/tw-ui'
+// 重要：导入样式
+import '@malq/tw-ui/dist/styles/index.css'
 import { TwButton } from '@malq/tw-ui'
 import 'tw-ui/dist/style.css'
 </script>
 ```
 
-### Tailwind CSS 配置
-
-在你的项目中，需要确保 Tailwind CSS 配置文件包含以下设置：
-
-```js
-/** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: [
-    "./index.html",
-    "./src/**/*.{vue,js,ts,jsx,tsx}",
-    "./node_modules/tw-ui/**/*.{vue,js,ts,jsx,tsx}"  // 添加这一行
-  ],
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-  prefix: 'tw-',  // 确保添加这个前缀
-}
-```
-
 ## 组件列表
 
-- TwAlert
-- TwAvatar
-- TwBadge
-- TwBreadcrumb
-- TwButton
-- TwCard
-- TwCheckbox
-- TwInput
-- TwModal
-- TwPagination
-- TwRadio
-- TwSelect
-- TwSwitch
-- TwTabs
-- TwTextarea
-- TwTooltip
+- Alert 警告提示
+- Avatar 头像
+- Badge 徽章
+- Breadcrumb 面包屑
+- Button 按钮
+- Card 卡片
+- Checkbox 复选框
+- Dialog 对话框
+- Form 表单
+- Input 输入框
+- Modal 模态框
+- Pagination 分页
+- Radio 单选框
+- Select 选择器
+- Switch 开关
+- Table 表格
+- Tabs 标签页
+- Textarea 文本域
+- Tooltip 文字提示
+- Upload 上传
 
-## 开发
+## 文档
 
-```bash
-# 安装依赖
-npm install
+访问我们的[在线文档](https://tw-ui.example.com)了解更多信息。
 
-# 启动开发服务器
-npm run dev
+## 贡献
 
-# 构建组件库
-npm run build
-```
+欢迎贡献代码，提交问题和功能请求。
 
-## License
+## 许可证
 
-MIT
+[MIT](LICENSE)

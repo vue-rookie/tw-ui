@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 组件库全局样式 */
+.tw-form-disabled {
+  @apply tw-opacity-60 tw-pointer-events-none;
+}
+
+.tw-dialog-overlay {
+  @apply tw-fixed tw-inset-0 tw-z-50 tw-flex tw-items-center tw-justify-center tw-overflow-auto;
+}
+
+.tw-dialog-overlay-mask {
+  @apply tw-bg-black tw-bg-opacity-50;
+}
+
+/* 锁定滚动条 */
+body.tw-overflow-hidden {
+  overflow: hidden;
+} 

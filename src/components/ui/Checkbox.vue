@@ -1,47 +1,168 @@
 <template>
-  <div class="tw-flex tw-items-center">
-    <input
-      :id="id"
-      type="checkbox"
-      :checked="modelValue"
-      :disabled="disabled"
+  <label 
+    class="tw-checkbox-wrapper"
+    :class="[
+      { 'tw-checkbox-wrapper-disabled': disabled },
+      { 'tw-checkbox-wrapper-block': block }
+    ]"
+  >
+    <span 
+      class="tw-checkbox"
       :class="[
-        'tw-peer tw-h-4 tw-w-4 tw-shrink-0 tw-rounded-sm tw-border tw-border-gray-200 tw-ring-offset-white focus-visible:tw-outline-none focus-visible:tw-ring-2 focus-visible:tw-ring-offset-2 disabled:tw-cursor-not-allowed disabled:tw-opacity-50 data-[state=checked]:tw-bg-blue-500 data-[state=checked]:tw-text-white',
-        className
+        { 'tw-checkbox-checked': modelValue },
+        { 'tw-checkbox-disabled': disabled },
+        { 'tw-checkbox-indeterminate': indeterminate }
       ]"
-      @change="$emit('update:modelValue', ($event.target as HTMLInputElement).checked)"
-    />
-    <label
-      v-if="$slots.default"
-      :for="id"
-      class="tw-ml-2 tw-text-sm tw-font-medium tw-leading-none tw-peer-disabled:tw-cursor-not-allowed tw-peer-disabled:tw-opacity-70"
     >
+      <input
+        type="checkbox"
+        :checked="modelValue"
+        :disabled="disabled"
+        :name="name"
+        :value="value"
+        class="tw-checkbox-input"
+        @change="handleChange"
+        @focus="handleFocus"
+        @blur="handleBlur"
+      />
+      <span class="tw-checkbox-inner"></span>
+    </span>
+    <span v-if="$slots.default" class="tw-checkbox-label">
       <slot></slot>
-    </label>
-  </div>
+    </span>
+  </label>
 </template>
 
 <script setup lang="ts">
-defineOptions({
-  name: 'TwCheckbox'
-})
+interface CheckboxProps {
+  modelValue: boolean
+  disabled?: boolean
+  indeterminate?: boolean
+  name?: string
+  value?: string | number | boolean
+  block?: boolean
+}
 
-withDefaults(
-  defineProps<{
-    id?: string
-    modelValue?: boolean
-    disabled?: boolean
-    className?: string
-  }>(),
-  {
-    id: '',
-    modelValue: false,
-    disabled: false,
-    className: ''
-  }
-)
+defineProps<CheckboxProps>()
 
-defineEmits<{
+const emit = defineEmits<{
   (e: 'update:modelValue', value: boolean): void
+  (e: 'change', value: boolean): void
+  (e: 'focus', event: FocusEvent): void
+  (e: 'blur', event: FocusEvent): void
 }>()
-</script> 
+
+// 处理变更事件
+const handleChange = (event: Event) => {
+  const target = event.target as HTMLInputElement
+  emit('update:modelValue', target.checked)
+  emit('change', target.checked)
+}
+
+// 处理焦点事件
+const handleFocus = (event: FocusEvent) => {
+  emit('focus', event)
+}
+
+// 处理失焦事件
+const handleBlur = (event: FocusEvent) => {
+  emit('blur', event)
+}
+</script>
+
+<style scoped>
+.tw-checkbox-wrapper {
+  @apply tw-inline-flex tw-items-center tw-cursor-pointer tw-select-none;
+  @apply tw-transition-all tw-duration-200 tw-ease-in-out;
+}
+
+.tw-checkbox-wrapper-block {
+  @apply tw-flex tw-w-full;
+}
+
+.tw-checkbox-wrapper-disabled {
+  @apply tw-cursor-not-allowed tw-opacity-60;
+}
+
+.tw-checkbox {
+  @apply tw-relative tw-inline-flex tw-items-center tw-justify-center;
+  @apply tw-w-5 tw-h-5 tw-rounded tw-border tw-border-gray-300 tw-bg-white;
+  @apply tw-transition-all tw-duration-200 tw-ease-in-out;
+}
+
+.tw-checkbox-input {
+  @apply tw-absolute tw-opacity-0 tw-w-full tw-h-full tw-cursor-pointer;
+  @apply tw-z-10;
+}
+
+.tw-checkbox-inner {
+  @apply tw-inline-block tw-w-full tw-h-full tw-rounded;
+  @apply tw-transition-all tw-duration-200 tw-ease-in-out;
+}
+
+.tw-checkbox-label {
+  @apply tw-ml-2 tw-text-sm tw-text-gray-700;
+  @apply tw-transition-colors tw-duration-200;
+}
+
+/* 选中状态 */
+.tw-checkbox-checked {
+  @apply tw-border-blue-500 tw-bg-blue-500;
+}
+
+.tw-checkbox-checked .tw-checkbox-inner::after {
+  content: '';
+  @apply tw-absolute tw-top-1/2 tw-left-1/2;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: translate(-50%, -60%) rotate(45deg);
+}
+
+/* 半选状态 */
+.tw-checkbox-indeterminate {
+  @apply tw-border-blue-500 tw-bg-blue-500;
+}
+
+.tw-checkbox-indeterminate .tw-checkbox-inner::after {
+  content: '';
+  @apply tw-absolute tw-top-1/2 tw-left-1/2;
+  width: 10px;
+  height: 2px;
+  background-color: white;
+  transform: translate(-50%, -50%);
+}
+
+/* 禁用状态 */
+.tw-checkbox-disabled {
+  @apply tw-bg-gray-100 tw-border-gray-200;
+}
+
+.tw-checkbox-disabled .tw-checkbox-input {
+  @apply tw-cursor-not-allowed;
+}
+
+.tw-checkbox-disabled.tw-checkbox-checked {
+  @apply tw-bg-blue-200 tw-border-blue-200;
+}
+
+.tw-checkbox-disabled.tw-checkbox-indeterminate {
+  @apply tw-bg-blue-200 tw-border-blue-200;
+}
+
+/* 悬停效果 */
+.tw-checkbox:not(.tw-checkbox-disabled):hover {
+  @apply tw-border-blue-500;
+}
+
+/* 聚焦效果 */
+.tw-checkbox-input:focus + .tw-checkbox-inner {
+  @apply tw-ring-2 tw-ring-blue-500 tw-ring-opacity-50;
+}
+
+/* 点击动画 */
+.tw-checkbox-input:active + .tw-checkbox-inner {
+  transform: scale(0.9);
+}
+</style> 

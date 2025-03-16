@@ -1,6 +1,6 @@
 {
   "name": "@malq/tw-ui",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A Vue 3 UI component library built with Tailwind CSS",
   "type": "module",
   "main": "dist/tw-ui.umd.js",
@@ -33,10 +33,10 @@
     "@heroicons/vue": "^2.2.0",
     "@vitejs/plugin-vue": "^5.2.1",
     "@vue/tsconfig": "^0.7.0",
-    "autoprefixer": "^10.4.19",
-    "postcss": "^8.4.35",
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
     "postcss-nesting": "^13.0.1",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.17",
     "typescript": "~5.7.2",
     "vite": "^6.2.0",
     "vue-tsc": "^2.2.4"
