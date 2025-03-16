@@ -1,0 +1,9 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .tw-container {
+    @apply tw-w-full tw-mx-auto tw-px-4 sm:tw-px-6 lg:tw-px-8 tw-max-w-7xl;
+  }
+} 
