@@ -14,7 +14,7 @@ npm install @malq/tw-ui
 
 ```typescript
 import { createApp } from 'vue'
-import TwUI from 'tw-ui'
+import TwUI from '@malq/tw-ui'
 import 'tw-ui/dist/style.css'
 
 const app = createApp(App)
@@ -30,7 +30,7 @@ app.mount('#app')
 </template>
 
 <script setup lang="ts">
-import { TwButton } from 'tw-ui'
+import { TwButton } from '@malq/tw-ui'
 import 'tw-ui/dist/style.css'
 </script>
 ```
