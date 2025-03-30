@@ -26,7 +26,7 @@
       <!-- 选择框内容 -->
       <div class="tw-select-value">
         <template v-if="multiple">
-          <div v-if="selectedOptions.length" class="tw-select-tags">
+          <div v-if="selectedOptions?.length" class="tw-select-tags">
             <div 
               v-for="option in selectedOptions" 
               :key="option.value" 
@@ -38,9 +38,7 @@
                 class="tw-select-tag-remove"
                 @click.stop="removeOption(option.value)"
               >
-                <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-3 tw-w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <Icon icon="mdi:close" class="tw-h-4 tw-w-4" />
               </button>
             </div>
           </div>
@@ -56,28 +54,21 @@
       
       <!-- 下拉箭头 -->
       <div class="tw-select-arrow">
-        <svg 
-          xmlns="http://www.w3.org/2000/svg" 
+        <Icon 
+          icon="mdi:chevron-down" 
           class="tw-h-4 tw-w-4" 
           :class="{ 'tw-rotate-180': isOpen }"
-          fill="none" 
-          viewBox="0 0 24 24" 
-          stroke="currentColor"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-        </svg>
+        />
       </div>
       
       <!-- 清除按钮 -->
       <button
-        v-if="clearable && (multiple ? selectedOptions.length > 0 : selectedOption) && !disabled"
+        v-if="clearable && (multiple ? selectedOptions?.length > 0 : selectedOption) && !disabled"
         type="button"
         class="tw-select-clear"
         @click.stop="clearSelection"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
+        <Icon icon="mdi:close" class="tw-h-4 tw-w-4" />
       </button>
     </div>
     
@@ -103,7 +94,7 @@
       <!-- 选项列表 -->
       <div class="tw-select-options">
         <div 
-          v-if="filteredOptions.length === 0" 
+          v-if="filteredOptions?.length === 0" 
           class="tw-select-empty"
         >
           {{ emptyText }}
@@ -124,7 +115,13 @@
             <div 
               class="tw-select-checkbox-inner"
               :class="{ 'tw-select-checkbox-checked': isOptionSelected(option.value) }"
-            ></div>
+            >
+              <Icon 
+                v-if="isOptionSelected(option.value)"
+                icon="mdi:check" 
+                class="tw-h-3 tw-w-3 tw-text-white" 
+              />
+            </div>
           </div>
           
           <!-- 选项内容 -->
@@ -139,6 +136,7 @@
 
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted, onBeforeUnmount } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface SelectOption {
   label: string
@@ -195,7 +193,7 @@ const focusedIndex = ref(0)
 const selectedOptions = computed(() => {
   if (props.multiple) {
     const values = props.modelValue as (string | number)[]
-    return props.options.filter(option => values.includes(option.value))
+    return props.options?.filter(option => values.includes(option.value))
   }
   return []
 })
@@ -210,12 +208,13 @@ const selectedOption = computed(() => {
 
 // 过滤后的选项
 const filteredOptions = computed(() => {
+  if (!props.options) return []
   if (props.filterable && searchQuery.value) {
-    return props.options.filter(option => 
+    return props.options?.filter(option => 
       option.label.toLowerCase().includes(searchQuery.value.toLowerCase())
     )
   }
-  return props.options || []
+  return props.options
 })
 
 // 判断选项是否被选中
@@ -282,15 +281,15 @@ const handleKeydown = (event: KeyboardEvent) => {
         break
       case 'ArrowDown':
         event.preventDefault()
-        focusedIndex.value = (focusedIndex.value + 1) % filteredOptions.value.length
+        focusedIndex.value = (focusedIndex.value + 1) % filteredOptions.value?.length
         break
       case 'ArrowUp':
         event.preventDefault()
-        focusedIndex.value = (focusedIndex.value - 1 + filteredOptions.value.length) % filteredOptions.value.length
+        focusedIndex.value = (focusedIndex.value - 1 + filteredOptions.value?.length) % filteredOptions.value?.length
         break
       case 'Enter':
         event.preventDefault()
-        if (filteredOptions?.value.length > 0 && focusedIndex.value >= 0) {
+        if (filteredOptions?.value?.length > 0 && focusedIndex.value >= 0) {
           selectOption(filteredOptions.value[focusedIndex.value])
         }
         break
@@ -505,17 +504,10 @@ defineExpose({
 
 .tw-select-checkbox-checked {
   @apply tw-bg-blue-500 tw-border-blue-500;
-  position: relative;
 }
 
 .tw-select-checkbox-checked::after {
-  content: '';
-  position: absolute;
-  width: 6px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg) translate(-1px, -1px);
+  display: none;
 }
 
 .tw-select-option-content {

@@ -18,9 +18,7 @@
     >
       <slot name="drag">
         <div class="tw-upload-drag-icon">
-          <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-12 tw-w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-          </svg>
+          <Icon icon="mdi:cloud-upload" class="tw-h-12 tw-w-12" />
         </div>
         <div class="tw-upload-drag-text">拖拽文件到此处或<span class="tw-text-blue-500">点击上传</span></div>
         <div class="tw-upload-drag-hint">{{ hint || (multiple ? '支持多文件上传' : '只能上传单个文件') }}</div>
@@ -36,9 +34,7 @@
           :disabled="disabled"
         >
           <span class="tw-flex tw-items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-5 tw-w-5 tw-mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-            </svg>
+            <Icon icon="mdi:upload" class="tw-h-5 tw-w-5 tw-mr-2" />
             {{ buttonText || '上传文件' }}
           </span>
         </button>
@@ -48,63 +44,67 @@
     <!-- 文件列表 -->
     <div v-if="showFileList && fileList.length > 0" class="tw-upload-file-list">
       <div 
-        v-for="(file, index) in fileList" 
+        v-for="file in fileList" 
         :key="file.uid" 
         class="tw-upload-file-item"
+        :class="{ 'tw-upload-file-item-error': file.status === 'error' }"
       >
-        <!-- 图片预览 -->
-        <div v-if="listType === 'picture'" class="tw-upload-file-thumbnail">
-          <img 
-            v-if="file.url && isImageFile(file)" 
-            :src="file.url" 
-            :alt="file.name"
-            class="tw-upload-file-image"
-            @click="handlePreview(file)"
-          />
-          <div v-else class="tw-upload-file-icon">
-            <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-8 tw-w-8 tw-text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-            </svg>
-          </div>
-        </div>
-        
-        <!-- 文件信息 -->
         <div class="tw-upload-file-info">
-          <div class="tw-upload-file-name" :title="file.name">
-            <span v-if="file.status === 'uploading'">正在上传: {{ file.name }}</span>
-            <span v-else-if="file.status === 'success'">{{ file.name }}</span>
-            <span v-else-if="file.status === 'error'" class="tw-text-red-500">{{ file.name }} - 上传失败</span>
-            <span v-else>{{ file.name }}</span>
+          <div class="tw-upload-file-name">
+            <Icon 
+              :icon="getFileIcon(file.name)" 
+              class="tw-h-5 tw-w-5 tw-mr-2 tw-text-gray-400" 
+            />
+            {{ file.name }}
           </div>
-          
-          <!-- 上传进度条 -->
-          <div v-if="file.status === 'uploading'" class="tw-upload-progress">
-            <div class="tw-upload-progress-bar" :style="{ width: file.percentage + '%' }"></div>
-          </div>
+          <div class="tw-upload-file-size">{{ formatFileSize(file.size) }}</div>
         </div>
         
-        <!-- 操作按钮 -->
         <div class="tw-upload-file-actions">
+          <!-- 预览按钮 -->
           <button 
-            v-if="file.status === 'success' && isImageFile(file)" 
-            type="button" 
-            class="tw-upload-file-action tw-text-blue-500 hover:tw-text-blue-700"
+            v-if="file.status === 'success' && isPreviewable(file.name)"
+            type="button"
+            class="tw-upload-file-action"
             @click="handlePreview(file)"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-5 tw-w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-            </svg>
+            <Icon icon="mdi:eye" class="tw-h-4 tw-w-4" />
           </button>
+          
+          <!-- 下载按钮 -->
           <button 
-            type="button" 
-            class="tw-upload-file-action tw-text-red-500 hover:tw-text-red-700"
-            @click="handleRemove(file, index)"
+            v-if="file.status === 'success'"
+            type="button"
+            class="tw-upload-file-action"
+            @click="handleDownload(file)"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-5 tw-w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
+            <Icon icon="mdi:download" class="tw-h-4 tw-w-4" />
           </button>
+          
+          <!-- 删除按钮 -->
+          <button 
+            type="button"
+            class="tw-upload-file-action"
+            @click="handleRemove(file)"
+          >
+            <Icon icon="mdi:close" class="tw-h-4 tw-w-4" />
+          </button>
+        </div>
+        
+        <!-- 上传进度 -->
+        <div v-if="file.status === 'uploading'" class="tw-upload-file-progress">
+          <div class="tw-upload-progress-bar">
+            <div 
+              class="tw-upload-progress-inner"
+              :style="{ width: `${file.percentage}%` }"
+            ></div>
+          </div>
+          <div class="tw-upload-progress-text">{{ file.percentage }}%</div>
+        </div>
+        
+        <!-- 错误信息 -->
+        <div v-if="file.status === 'error'" class="tw-upload-file-error">
+          {{ file.error?.message || '上传失败' }}
         </div>
       </div>
     </div>
@@ -135,7 +135,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount } from 'vue'
+import { ref, watch, onBeforeUnmount, computed, onMounted } from 'vue'
+import { Icon } from '@iconify/vue'
 
 export interface UploadFile {
   uid: string
@@ -378,7 +379,7 @@ const upload = (file: UploadFile) => {
 }
 
 // 移除文件
-const handleRemove = async (file: UploadFile, index: number) => {
+const handleRemove = async (file: UploadFile) => {
   if (props.beforeRemove) {
     try {
       const result = await props.beforeRemove(file, fileList.value)
@@ -397,7 +398,7 @@ const handleRemove = async (file: UploadFile, index: number) => {
     }
   }
   
-  fileList.value.splice(index, 1)
+  fileList.value = fileList.value.filter(f => f.uid !== file.uid)
   emit('update:fileList', fileList.value)
   emit('remove', file, fileList.value)
 }
@@ -511,12 +512,8 @@ defineExpose({
   @apply tw-truncate tw-text-sm tw-font-medium tw-text-gray-700;
 }
 
-.tw-upload-progress {
-  @apply tw-mt-1 tw-h-1.5 tw-w-full tw-bg-gray-200 tw-rounded-full tw-overflow-hidden;
-}
-
-.tw-upload-progress-bar {
-  @apply tw-h-full tw-bg-blue-500 tw-rounded-full tw-transition-all;
+.tw-upload-file-size {
+  @apply tw-text-xs tw-text-gray-500;
 }
 
 .tw-upload-file-actions {
@@ -524,7 +521,8 @@ defineExpose({
 }
 
 .tw-upload-file-action {
-  @apply tw-p-1 tw-rounded-full hover:tw-bg-gray-100 focus:tw-outline-none;
+  @apply tw-flex tw-items-center tw-justify-center tw-p-1 tw-rounded-full;
+  @apply hover:tw-bg-gray-100 tw-transition-colors tw-duration-200;
 }
 
 .tw-upload-preview-modal {
@@ -541,5 +539,29 @@ defineExpose({
 
 .tw-upload-preview-close {
   @apply tw-absolute tw-top-2 tw-right-2 tw-p-1 tw-rounded-full tw-bg-white tw-text-gray-700 hover:tw-text-gray-900 focus:tw-outline-none;
+}
+
+.tw-upload-file-item-error {
+  @apply tw-border-red-500;
+}
+
+.tw-upload-file-progress {
+  @apply tw-mt-1 tw-h-1.5 tw-w-full tw-bg-gray-200 tw-rounded-full tw-overflow-hidden;
+}
+
+.tw-upload-progress-bar {
+  @apply tw-h-full tw-bg-blue-500 tw-rounded-full tw-transition-all;
+}
+
+.tw-upload-progress-inner {
+  @apply tw-h-full tw-bg-blue-500 tw-rounded-full tw-transition-all;
+}
+
+.tw-upload-progress-text {
+  @apply tw-text-xs tw-text-gray-500 tw-text-center;
+}
+
+.tw-upload-file-error {
+  @apply tw-text-red-500 tw-text-sm;
 }
 </style> 

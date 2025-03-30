@@ -26,7 +26,9 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "vue": "^3.2.0"
+    "@iconify/vue": "^4.3.0",
+    "vue": "^3.2.0",
+    "vue-router": "4"
   },
   "devDependencies": {
     "@headlessui/vue": "^1.7.23",

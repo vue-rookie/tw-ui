@@ -12,14 +12,14 @@
     <!-- 前缀图标 -->
     <div v-if="$slots.prefix || prefixIcon" class="tw-input-prefix">
       <slot name="prefix">
-        <component v-if="prefixIcon" :is="resolveIcon(prefixIcon)" class="tw-input-icon" />
+        <Icon v-if="prefixIcon" :icon="prefixIcon" class="tw-input-icon" />
       </slot>
     </div>
     
     <!-- 输入框 -->
     <input
       ref="inputRef"
-      :type="type"
+      :type="actualType"
       :value="modelValue"
       :placeholder="placeholder"
       :disabled="disabled"
@@ -53,38 +53,33 @@
       class="tw-input-suffix"
     >
       <!-- 清除按钮 -->
-      <button
+      <span
         v-if="clearable && modelValue && !disabled && !readonly"
-        type="button"
+        type="text"
         class="tw-input-clear"
-        @click="handleClear"
+        @click="clearInput"
         tabindex="-1"
       >
-        <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
+        <Icon icon="mdi:close" class="tw-input-icon" />
+      </span>
       
       <!-- 密码切换按钮 -->
       <button
-        v-if="showPasswordToggle"
+        v-if="showPasswordToggle && type === 'password'"
         type="button"
         class="tw-input-password-toggle"
         @click="togglePasswordVisibility"
         tabindex="-1"
       >
-        <svg v-if="passwordVisible" xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-        </svg>
-        <svg v-else xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-        </svg>
+        <Icon 
+          :icon="showPassword ? 'mdi:eye-off' : 'mdi:eye'" 
+          class="tw-input-icon" 
+        />
       </button>
       
       <!-- 自定义后缀 -->
       <slot name="suffix">
-        <component v-if="suffixIcon" :is="resolveIcon(suffixIcon)" class="tw-input-icon" />
+        <Icon v-if="suffixIcon" :icon="suffixIcon" class="tw-input-icon" />
       </slot>
     </div>
     
@@ -96,11 +91,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface InputProps {
-  modelValue: string
+  modelValue: string | number
   type?: string
+  size?: 'small' | 'default' | 'large'
   placeholder?: string
   disabled?: boolean
   readonly?: boolean
@@ -115,7 +112,6 @@ interface InputProps {
   showWordLimit?: boolean
   prefixIcon?: string
   suffixIcon?: string
-  size?: 'small' | 'default' | 'large'
   error?: boolean
   success?: boolean
   block?: boolean
@@ -123,14 +119,21 @@ interface InputProps {
 
 const props = withDefaults(defineProps<InputProps>(), {
   type: 'text',
+  size: 'default',
   placeholder: '',
   disabled: false,
   readonly: false,
+  maxlength: undefined,
+  minlength: undefined,
   autocomplete: 'off',
+  name: undefined,
+  form: undefined,
+  id: undefined,
   clearable: false,
   showPasswordToggle: false,
   showWordLimit: false,
-  size: 'default',
+  prefixIcon: undefined,
+  suffixIcon: undefined,
   error: false,
   success: false,
   block: true
@@ -140,8 +143,8 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string): void
   (e: 'input', value: string): void
   (e: 'change', value: string): void
-  (e: 'focus', event: FocusEvent): void
-  (e: 'blur', event: FocusEvent): void
+  (e: 'focus'): void
+  (e: 'blur'): void
   (e: 'keydown', event: KeyboardEvent): void
   (e: 'keyup', event: KeyboardEvent): void
   (e: 'keypress', event: KeyboardEvent): void
@@ -149,78 +152,78 @@ const emit = defineEmits<{
 }>()
 
 const inputRef = ref<HTMLInputElement | null>(null)
-const passwordVisible = ref(false)
+const showPassword = ref(false)
+const isFocused = ref(false)
 
-// 是否显示密码切换按钮
-const showPasswordToggle = computed(() => {
-  return props.type === 'password' && props.showPasswordToggle
+// 计算实际输入类型
+const actualType = computed(() => {
+  if (props.type === 'password' && showPassword.value) {
+    return 'text'
+  }
+  return props.type
 })
 
 // 处理输入事件
 const handleInput = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('update:modelValue', target.value)
-  emit('input', target.value)
+  const value = (event.target as HTMLInputElement).value
+  emit('update:modelValue', value)
+  emit('input', value)
 }
 
 // 处理变更事件
 const handleChange = (event: Event) => {
-  const target = event.target as HTMLInputElement
-  emit('change', target.value)
+  const value = (event.target as HTMLInputElement).value
+  emit('change', value)
 }
 
 // 处理焦点事件
-const handleFocus = (event: FocusEvent) => {
-  emit('focus', event)
+const handleFocus = () => {
+  isFocused.value = true
+  emit('focus')
 }
 
 // 处理失焦事件
-const handleBlur = (event: FocusEvent) => {
-  emit('blur', event)
+const handleBlur = () => {
+  isFocused.value = false
+  emit('blur')
 }
 
-// 处理键盘按下事件
+// 处理键盘事件
 const handleKeydown = (event: KeyboardEvent) => {
   emit('keydown', event)
 }
 
-// 处理键盘释放事件
 const handleKeyup = (event: KeyboardEvent) => {
   emit('keyup', event)
 }
 
-// 处理键盘按键事件
 const handleKeypress = (event: KeyboardEvent) => {
   emit('keypress', event)
 }
 
-// 处理清除事件
-const handleClear = () => {
+// 清除输入内容
+const clearInput = () => {
+  if (props.disabled || props.readonly) return
   emit('update:modelValue', '')
   emit('clear')
-  // 聚焦输入框
-  inputRef.value?.focus()
+  nextTick(() => {
+    inputRef.value?.focus()
+  })
 }
 
-// 切换密码可见性
+// 切换密码显示
 const togglePasswordVisibility = () => {
-  passwordVisible.value = !passwordVisible.value
+  if (props.disabled || props.readonly) return
+  showPassword.value = !showPassword.value
+  nextTick(() => {
+    inputRef.value?.focus()
+  })
 }
 
-// 解析图标组件
+// 解析图标
 const resolveIcon = (icon: string) => {
-  // 这里可以根据实际情况实现图标解析逻辑
-  // 例如，可以返回一个SVG图标组件
-  console.log('解析图标:', icon)
-  return 'div'
+  return Icon
 }
-
-// 监听类型变化，重置密码可见性
-watch(() => props.type, (newType) => {
-  if (newType !== 'password') {
-    passwordVisible.value = false
-  }
-})
 
 // 暴露方法
 defineExpose({
@@ -240,11 +243,11 @@ defineExpose({
 }
 
 .tw-input {
-  @apply tw-w-full tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm tw-text-gray-900 tw-bg-white tw-transition-all tw-duration-200 tw-ease-in-out;
+  @apply tw-w-full tw-rounded-md tw-text-gray-700 tw-bg-white tw-border tw-border-solid tw-border-gray-300 tw-transition-all tw-duration-200 tw-ease-in-out;
 }
 
 .tw-input:focus {
-  @apply tw-outline-none tw-ring-2 tw-ring-blue-500 tw-border-blue-500;
+  @apply tw-outline-none tw-border-gray-400;
 }
 
 .tw-input-small {
@@ -281,22 +284,30 @@ defineExpose({
 }
 
 .tw-input-icon {
-  @apply tw-w-4 tw-h-4;
+  @apply tw-w-5 tw-h-5 tw-text-gray-400 tw-transition-colors tw-duration-200;
 }
 
-.tw-input-clear,
 .tw-input-password-toggle {
-  @apply tw-p-0.5 tw-rounded-full tw-text-gray-400 tw-transition-colors tw-duration-200 tw-ease-in-out;
+  @apply tw-flex tw-items-center tw-justify-center tw-p-1 tw-rounded-full;
+  @apply hover:tw-bg-gray-100 tw-transition-colors tw-duration-200;
 }
 
-.tw-input-clear:hover,
-.tw-input-password-toggle:hover {
-  @apply tw-text-gray-500 tw-bg-gray-100;
+.tw-input-clear:hover .tw-input-icon,
+.tw-input-password-toggle:hover .tw-input-icon {
+  @apply tw-text-gray-600;
 }
 
-.tw-input-clear:focus,
-.tw-input-password-toggle:focus {
-  @apply tw-outline-none;
+.tw-input-prefix .tw-input-icon,
+.tw-input-suffix .tw-input-icon {
+  @apply tw-flex tw-items-center tw-justify-center;
+}
+
+.tw-input-prefix {
+  @apply tw-absolute tw-left-3 tw-flex tw-items-center tw-justify-center;
+}
+
+.tw-input-suffix {
+  @apply tw-absolute  tw-flex tw-items-center tw-justify-center tw-gap-2;
 }
 
 .tw-input-word-count {
@@ -305,7 +316,7 @@ defineExpose({
 
 /* 状态样式 */
 .tw-input-wrapper-disabled .tw-input {
-  @apply tw-bg-gray-100 tw-text-gray-500 tw-cursor-not-allowed;
+  @apply tw-bg-gray-50 tw-text-gray-500 tw-cursor-not-allowed tw-opacity-60;
 }
 
 .tw-input-wrapper-readonly .tw-input {
@@ -313,29 +324,29 @@ defineExpose({
 }
 
 .tw-input-error {
-  @apply tw-border-red-500;
+  @apply tw-border-red-500 tw-bg-white;
 }
 
 .tw-input-error:focus {
-  @apply tw-ring-red-500 tw-border-red-500;
+  @apply tw-border-red-600;
 }
 
 .tw-input-success {
-  @apply tw-border-green-500;
+  @apply tw-border-green-500 tw-bg-white;
 }
 
 .tw-input-success:focus {
-  @apply tw-ring-green-500 tw-border-green-500;
+  @apply tw-border-green-600;
 }
 
 /* 悬停效果 */
 .tw-input:not(:disabled):not(:read-only):hover {
-  @apply tw-border-gray-400;
+  @apply tw-border-gray-400 tw-bg-gray-50;
 }
 
 /* 聚焦动画 */
 .tw-input:focus {
-  animation: focusPulse 0.5s ease-out;
+  animation: none;
 }
 
 @keyframes focusPulse {

@@ -11,6 +11,7 @@
         ]"
         @click="$emit('update:modelValue', modelValue - 1)"
       >
+        <Icon icon="mdi:chevron-left" class="tw-h-5 tw-w-5 tw-mr-1" />
         上一页
       </button>
       <button
@@ -24,6 +25,7 @@
         @click="$emit('update:modelValue', modelValue + 1)"
       >
         下一页
+        <Icon icon="mdi:chevron-right" class="tw-h-5 tw-w-5 tw-ml-1" />
       </button>
     </div>
     <div class="tw-hidden sm:tw-flex sm:tw-flex-1 sm:tw-items-center sm:tw-justify-between">
@@ -46,21 +48,7 @@
             @click="$emit('update:modelValue', modelValue - 1)"
           >
             <span class="tw-sr-only">上一页</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="tw-h-5 tw-w-5"
-              aria-hidden="true"
-            >
-              <path d="m15 18-6-6 6-6" />
-            </svg>
+            <Icon icon="mdi:chevron-left" class="tw-h-5 tw-w-5" />
           </button>
           
           <template v-for="page in displayedPages" :key="page">
@@ -90,21 +78,7 @@
             @click="$emit('update:modelValue', modelValue + 1)"
           >
             <span class="tw-sr-only">下一页</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              class="tw-h-5 tw-w-5"
-              aria-hidden="true"
-            >
-              <path d="m9 18 6-6-6-6" />
-            </svg>
+            <Icon icon="mdi:chevron-right" class="tw-h-5 tw-w-5" />
           </button>
         </nav>
       </div>
@@ -114,6 +88,7 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
+import { Icon } from '@iconify/vue'
 
 defineOptions({
   name: 'TwPagination'
@@ -176,4 +151,8 @@ const displayedPages = computed(() => {
   
   return []
 })
-</script> 
+</script>
+
+<style scoped>
+/* ... existing code ... */
+</style> 

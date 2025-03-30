@@ -35,24 +35,29 @@
             <!-- 数据列 -->
             <th 
               v-for="column in columns" 
-              :key="column.prop" 
+              :key="column.key" 
               class="tw-px-4 tw-py-3"
-              :class="{ 'tw-cursor-pointer': column.sortable }"
               :style="{ width: column.width, textAlign: column.align || 'left' }"
-              @click="column.sortable ? handleSort(column.prop) : null"
+              :class="[column.className]"
             >
               <div class="tw-flex tw-items-center tw-justify-between">
-                <span>{{ column.label }}</span>
+                <span>{{ column.title }}</span>
                 <span v-if="column.sortable" class="tw-ml-1">
-                  <svg v-if="sortField === column.prop && sortOrder === 'asc'" xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
-                  </svg>
-                  <svg v-else-if="sortField === column.prop && sortOrder === 'desc'" xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                  <svg v-else xmlns="http://www.w3.org/2000/svg" class="tw-h-4 tw-w-4 tw-text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
-                  </svg>
+                  <Icon 
+                    v-if="sortField === column.key && sortOrder === 'asc'" 
+                    icon="mdi:sort-ascending" 
+                    class="tw-h-4 tw-w-4" 
+                  />
+                  <Icon 
+                    v-else-if="sortField === column.key && sortOrder === 'desc'" 
+                    icon="mdi:sort-descending" 
+                    class="tw-h-4 tw-w-4" 
+                  />
+                  <Icon 
+                    v-else 
+                    icon="mdi:sort" 
+                    class="tw-h-4 tw-w-4 tw-text-gray-400" 
+                  />
                 </span>
               </div>
             </th>
@@ -88,18 +93,19 @@
               <!-- 数据列 -->
               <td 
                 v-for="column in columns" 
-                :key="column.prop" 
+                :key="column.key" 
                 class="tw-px-4 tw-py-3"
+                :class="[column.className]"
                 :style="{ textAlign: column.align || 'left' }"
               >
                 <template v-if="column.slot">
                   <slot :name="column.slot" :row="row" :index="index"></slot>
                 </template>
                 <template v-else-if="column.formatter">
-                  {{ column.formatter(row[column.prop], row, index) }}
+                  {{ column.formatter(row[column.key], row, index) }}
                 </template>
                 <template v-else>
-                  {{ row[column.prop] }}
+                  {{ row[column.key] }}
                 </template>
               </td>
               
@@ -180,13 +186,14 @@
 
 <script setup lang="ts">
 import { computed, ref, watch, useSlots } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface Column {
-  label: string
-  prop: string
+  key: string
+  title: string
+  className?: string
   width?: string
   align?: 'left' | 'center' | 'right'
-  sortable?: boolean
   formatter?: (value: any, row: any, index: number) => string
   slot?: string
 }
@@ -194,7 +201,8 @@ interface Column {
 interface TableProps {
   data: any[]
   columns: Column[]
-  rowKey: string
+  className?: string
+  rowKey?: string
   selectable?: boolean
   showIndex?: boolean
   showPagination?: boolean
@@ -209,7 +217,7 @@ const props = withDefaults(defineProps<TableProps>(), {
   rowKey: 'id',
   selectable: false,
   showIndex: false,
-  showPagination: true,
+  showPagination: false,
   pageSize: 10,
   pageSizes: () => [10, 20, 50, 100],
   showSearch: false
@@ -258,7 +266,7 @@ const filteredData = computed(() => {
     const query = searchQuery.value.toLowerCase()
     result = result.filter(row => {
       return props.columns.some(column => {
-        const value = row[column.prop]
+        const value = row[column.key]
         return value !== null && value !== undefined && String(value).toLowerCase().includes(query)
       })
     })
@@ -384,5 +392,10 @@ defineExpose({
 
 .tw-table-search {
   @apply tw-flex tw-items-center;
+}
+
+.tw-table-empty,
+.tw-table-loading {
+  @apply tw-flex tw-flex-col tw-items-center tw-justify-center tw-py-12;
 }
 </style>

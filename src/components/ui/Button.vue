@@ -1,22 +1,23 @@
 <template>
   <button
     :class="[
-      'tw-button',
+      'tw-button tw-flex tw-items-center tw-justify-center',
       `tw-button-${type}`,
       `tw-button-${size}`,
       { 'tw-button-plain': plain },
-      { 'tw-button-rounded': rounded },
+      { 'tw-button-round': round },
       { 'tw-button-circle': circle },
       { 'tw-button-block': block },
       { 'tw-button-loading': loading },
-      { 'tw-button-disabled': disabled }
+      { 'tw-button-disabled': disabled },
+      { 'tw-cursor-pointer': !disabled && !loading }
     ]"
     :type="nativeType"
     :disabled="disabled || loading"
     @click="handleClick"
   >
-    <span v-if="loading" class="tw-button-loading-icon">
-      <span class="tw-button-spinner"></span>
+    <span v-if="loading" class="tw-button-loading-icon tw-flex tw-items-center">
+      <Icon icon="mingcute:loading-line" class="tw-animate-spin tw-text-xl" />
     </span>
     <span v-else-if="icon && iconPosition === 'left'" class="tw-button-icon tw-button-icon-left">
       <component :is="resolveIcon()" />
@@ -31,32 +32,32 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 interface ButtonProps {
-  type?: 'primary' | 'secondary' | 'success' | 'warning' | 'danger' | 'info'
+  type?: 'default' | 'primary' | 'success' | 'warning' | 'danger'
   size?: 'small' | 'default' | 'large'
   plain?: boolean
-  rounded?: boolean
+  round?: boolean
   circle?: boolean
   disabled?: boolean
   loading?: boolean
   icon?: string
   iconPosition?: 'left' | 'right'
   block?: boolean
-  tag?: string
   nativeType?: 'button' | 'submit' | 'reset'
 }
 
 const props = withDefaults(defineProps<ButtonProps>(), {
-  type: 'primary',
+  type: 'default',
   size: 'default',
   plain: false,
-  rounded: false,
+  round: false,
   circle: false,
   disabled: false,
   loading: false,
   iconPosition: 'left',
   block: false,
-  tag: 'button',
   nativeType: 'button'
 })
 
@@ -80,7 +81,9 @@ const resolveIcon = () => {
 
 <style scoped>
 .tw-button {
-  @apply tw-inline-flex tw-items-center tw-justify-center tw-font-medium tw-border tw-border-transparent tw-rounded-md tw-shadow-sm tw-transition-all tw-duration-200 tw-ease-in-out;
+  @apply tw-inline-flex tw-items-center tw-justify-center tw-font-medium tw-rounded-md tw-shadow-sm tw-transition-all tw-duration-200 tw-ease-in-out tw-select-none;
+  @apply tw-px-4 tw-py-2 tw-text-sm;
+  @apply hover:tw-shadow-md active:tw-shadow-sm;
 }
 
 .tw-button:focus {
@@ -88,7 +91,7 @@ const resolveIcon = () => {
 }
 
 .tw-button-content {
-  @apply tw-flex tw-items-center tw-justify-center;
+  @apply tw-flex tw-items-center tw-justify-center tw-gap-2;
 }
 
 /* 尺寸 */
@@ -96,233 +99,79 @@ const resolveIcon = () => {
   @apply tw-px-2.5 tw-py-1.5 tw-text-xs;
 }
 
-.tw-button-default {
-  @apply tw-px-4 tw-py-2 tw-text-sm;
-}
-
 .tw-button-large {
   @apply tw-px-6 tw-py-3 tw-text-base;
 }
 
 /* 类型 */
+.tw-button-default {
+  @apply tw-bg-white tw-text-gray-700 tw-border tw-border-solid tw-border-gray-300;
+  @apply hover:tw-bg-gray-50 hover:tw-border-gray-400;
+  @apply active:tw-bg-gray-100;
+}
+
 .tw-button-primary {
-  @apply tw-bg-blue-500 tw-text-white;
-}
-
-.tw-button-primary:hover {
-  @apply tw-bg-blue-600;
-}
-
-.tw-button-primary:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-blue-500;
-}
-
-.tw-button-primary:active {
-  @apply tw-bg-blue-700;
-}
-
-.tw-button-secondary {
-  @apply tw-bg-gray-500 tw-text-white;
-}
-
-.tw-button-secondary:hover {
-  @apply tw-bg-gray-600;
-}
-
-.tw-button-secondary:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-gray-500;
-}
-
-.tw-button-secondary:active {
-  @apply tw-bg-gray-700;
+  @apply tw-bg-blue-500 tw-text-white tw-border-0;
+  @apply hover:tw-bg-blue-600;
+  @apply active:tw-bg-blue-700;
 }
 
 .tw-button-success {
-  @apply tw-bg-green-500 tw-text-white;
-}
-
-.tw-button-success:hover {
-  @apply tw-bg-green-600;
-}
-
-.tw-button-success:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-green-500;
-}
-
-.tw-button-success:active {
-  @apply tw-bg-green-700;
+  @apply tw-bg-green-500 tw-text-white tw-border-0;
+  @apply hover:tw-bg-green-600;
+  @apply active:tw-bg-green-700;
 }
 
 .tw-button-warning {
-  @apply tw-bg-yellow-500 tw-text-white;
-}
-
-.tw-button-warning:hover {
-  @apply tw-bg-yellow-600;
-}
-
-.tw-button-warning:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-yellow-500;
-}
-
-.tw-button-warning:active {
-  @apply tw-bg-yellow-700;
+  @apply tw-bg-yellow-500 tw-text-white tw-border-0;
+  @apply hover:tw-bg-yellow-600;
+  @apply active:tw-bg-yellow-700;
 }
 
 .tw-button-danger {
-  @apply tw-bg-red-500 tw-text-white;
-}
-
-.tw-button-danger:hover {
-  @apply tw-bg-red-600;
-}
-
-.tw-button-danger:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-red-500;
-}
-
-.tw-button-danger:active {
-  @apply tw-bg-red-700;
-}
-
-.tw-button-info {
-  @apply tw-bg-blue-100 tw-text-blue-800;
-}
-
-.tw-button-info:hover {
-  @apply tw-bg-blue-200;
-}
-
-.tw-button-info:focus {
-  @apply tw-ring-2 tw-ring-offset-2 tw-ring-blue-400;
-}
-
-.tw-button-info:active {
-  @apply tw-bg-blue-300;
+  @apply tw-bg-red-500 tw-text-white tw-border-0;
+  @apply hover:tw-bg-red-600;
+  @apply active:tw-bg-red-700;
 }
 
 /* 朴素按钮 */
+.tw-button-plain {
+  @apply tw-bg-transparent tw-border tw-border-solid;
+}
+
+.tw-button-plain.tw-button-default {
+  @apply tw-text-gray-600 tw-border-gray-300;
+  @apply hover:tw-text-gray-700 hover:tw-bg-gray-50 hover:tw-border-gray-400;
+}
+
 .tw-button-plain.tw-button-primary {
-  @apply tw-bg-transparent tw-text-blue-500 tw-border-blue-500;
-}
-
-.tw-button-plain.tw-button-primary:hover {
-  @apply tw-bg-blue-50;
-}
-
-.tw-button-plain.tw-button-primary:active {
-  @apply tw-bg-blue-100;
-}
-
-.tw-button-plain.tw-button-secondary {
-  @apply tw-bg-transparent tw-text-gray-500 tw-border-gray-500;
-}
-
-.tw-button-plain.tw-button-secondary:hover {
-  @apply tw-bg-gray-50;
-}
-
-.tw-button-plain.tw-button-secondary:active {
-  @apply tw-bg-gray-100;
+  @apply tw-text-blue-500 tw-border-blue-500;
+  @apply hover:tw-text-blue-600 hover:tw-bg-blue-50 hover:tw-border-blue-600;
 }
 
 .tw-button-plain.tw-button-success {
-  @apply tw-bg-transparent tw-text-green-500 tw-border-green-500;
-}
-
-.tw-button-plain.tw-button-success:hover {
-  @apply tw-bg-green-50;
-}
-
-.tw-button-plain.tw-button-success:active {
-  @apply tw-bg-green-100;
+  @apply tw-text-green-500 tw-border-green-500;
+  @apply hover:tw-text-green-600 hover:tw-bg-green-50 hover:tw-border-green-600;
 }
 
 .tw-button-plain.tw-button-warning {
-  @apply tw-bg-transparent tw-text-yellow-500 tw-border-yellow-500;
-}
-
-.tw-button-plain.tw-button-warning:hover {
-  @apply tw-bg-yellow-50;
-}
-
-.tw-button-plain.tw-button-warning:active {
-  @apply tw-bg-yellow-100;
+  @apply tw-text-yellow-500 tw-border-yellow-500;
+  @apply hover:tw-text-yellow-600 hover:tw-bg-yellow-50 hover:tw-border-yellow-600;
 }
 
 .tw-button-plain.tw-button-danger {
-  @apply tw-bg-transparent tw-text-red-500 tw-border-red-500;
-}
-
-.tw-button-plain.tw-button-danger:hover {
-  @apply tw-bg-red-50;
-}
-
-.tw-button-plain.tw-button-danger:active {
-  @apply tw-bg-red-100;
-}
-
-.tw-button-plain.tw-button-info {
-  @apply tw-bg-transparent tw-text-blue-400 tw-border-blue-200;
-}
-
-.tw-button-plain.tw-button-info:hover {
-  @apply tw-bg-blue-50;
-}
-
-.tw-button-plain.tw-button-info:active {
-  @apply tw-bg-blue-100;
+  @apply tw-text-red-500 tw-border-red-500;
+  @apply hover:tw-text-red-600 hover:tw-bg-red-50 hover:tw-border-red-600;
 }
 
 /* 圆角按钮 */
-.tw-button-rounded {
+.tw-button-round {
   @apply tw-rounded-full;
 }
 
 /* 圆形按钮 */
 .tw-button-circle {
-  @apply tw-rounded-full tw-p-0;
-}
-
-.tw-button-circle.tw-button-small {
-  @apply tw-w-8 tw-h-8;
-}
-
-.tw-button-circle.tw-button-default {
-  @apply tw-w-10 tw-h-10;
-}
-
-.tw-button-circle.tw-button-large {
-  @apply tw-w-12 tw-h-12;
-}
-
-/* 禁用状态 */
-.tw-button-disabled {
-  @apply tw-opacity-60 tw-cursor-not-allowed;
-}
-
-.tw-button-disabled:hover,
-.tw-button-disabled:focus,
-.tw-button-disabled:active {
-  @apply tw-opacity-60;
-}
-
-/* 加载状态 */
-.tw-button-loading {
-  @apply tw-cursor-wait;
-}
-
-.tw-button-loading-icon {
-  @apply tw-mr-2;
-}
-
-/* 图标 */
-.tw-button-icon-left {
-  @apply tw-mr-2;
-}
-
-.tw-button-icon-right {
-  @apply tw-ml-2;
+  @apply tw-rounded-full tw-p-2;
 }
 
 /* 块级按钮 */
@@ -330,21 +179,31 @@ const resolveIcon = () => {
   @apply tw-w-full;
 }
 
-/* 添加微妙的过渡效果 */
-.tw-button {
-  transform: translateY(0);
+/* 禁用状态 */
+.tw-button-disabled {
+  @apply tw-opacity-60 tw-cursor-not-allowed;
+  @apply hover:tw-shadow-sm active:tw-shadow-sm;
 }
 
-.tw-button:active:not(.tw-button-disabled):not(.tw-button-loading) {
-  transform: translateY(1px);
+/* 加载状态 */
+.tw-button-loading {
+  @apply hover:tw-shadow-sm active:tw-shadow-sm;
 }
 
-/* 添加阴影效果 */
-.tw-button:not(.tw-button-plain):not(.tw-button-disabled):not(.tw-button-loading) {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+.tw-button-loading-icon {
+  @apply tw-mr-2;
 }
 
-.tw-button:not(.tw-button-plain):not(.tw-button-disabled):not(.tw-button-loading):hover {
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+/* 图标 */
+.tw-button-icon {
+  @apply tw-flex tw-items-center tw-justify-center;
+}
+
+.tw-button-icon-left {
+  @apply tw-mr-1;
+}
+
+.tw-button-icon-right {
+  @apply tw-ml-1;
 }
 </style> 
