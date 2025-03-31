@@ -24,11 +24,13 @@ interface TabPaneProps {
   label: string
   disabled?: boolean
   lazy?: boolean
+  closable?: boolean
 }
 
 const props = withDefaults(defineProps<TabPaneProps>(), {
   disabled: false,
-  lazy: false
+  lazy: false,
+  closable: false
 })
 
 // 注入当前活动的标签页名称

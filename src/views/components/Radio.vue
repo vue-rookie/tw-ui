@@ -8,10 +8,9 @@
         <h2 class="text-2xl font-semibold mb-4">基础用法</h2>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <tw-radio v-model="radioValue" label="1">选项1</tw-radio>
-            <tw-radio v-model="radioValue" label="2">选项2</tw-radio>
-            <tw-radio v-model="radioValue" label="3">选项3</tw-radio>
-            <span class="text-gray-600">选中值：{{ radioValue }}</span>
+            <tw-radio v-model="radio" value="1">选项1</tw-radio>
+            <tw-radio v-model="radio" value="2">选项2</tw-radio>
+            <span class="text-gray-600">选中值：{{ radio }}</span>
           </div>
         </div>
       </section>
@@ -21,8 +20,8 @@
         <h2 class="text-2xl font-semibold mb-4">禁用状态</h2>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <tw-radio disabled>禁用</tw-radio>
-            <tw-radio disabled checked>禁用且选中</tw-radio>
+            <tw-radio v-model="radio" value="1" disabled>禁用</tw-radio>
+            <tw-radio v-model="radio" value="2" disabled>禁用且选中</tw-radio>
           </div>
         </div>
       </section>
@@ -32,12 +31,25 @@
         <h2 class="text-2xl font-semibold mb-4">单选框组</h2>
         <div class="space-y-4">
           <div class="flex items-center gap-4">
-            <tw-radio-group v-model="groupValue">
-              <tw-radio label="1">选项1</tw-radio>
-              <tw-radio label="2">选项2</tw-radio>
-              <tw-radio label="3">选项3</tw-radio>
+            <tw-radio-group v-model="radioGroup">
+              <tw-radio value="1">选项1</tw-radio>
+              <tw-radio value="2">选项2</tw-radio>
+              <tw-radio value="3">选项3</tw-radio>
             </tw-radio-group>
-            <span class="text-gray-600">选中值：{{ groupValue }}</span>
+            <span class="text-gray-600">选中值：{{ radioGroup }}</span>
+          </div>
+        </div>
+      </section>
+
+
+      <!-- 不同尺寸 -->
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">不同尺寸</h2>
+        <div class="space-y-4">
+          <div class="flex items-center flex-wrap gap-4">
+            <tw-radio v-model="radioSize" value="1" size="small">小尺寸</tw-radio>
+            <tw-radio v-model="radioSize" value="2">默认尺寸</tw-radio>
+            <tw-radio v-model="radioSize" value="3" size="large">大尺寸</tw-radio>
           </div>
         </div>
       </section>
@@ -46,28 +58,49 @@
       <section>
         <h2 class="text-2xl font-semibold mb-4">按钮样式</h2>
         <div class="space-y-4">
-          <div class="flex items-center gap-4">
-            <tw-radio-group v-model="buttonValue" button>
-              <tw-radio label="1">选项1</tw-radio>
-              <tw-radio label="2">选项2</tw-radio>
-              <tw-radio label="3">选项3</tw-radio>
+          <div>
+            <h3 class="text-lg font-medium mb-2">基础按钮样式</h3>
+            <tw-radio-group v-model="radioButton" button>
+              <tw-radio value="1">选项1</tw-radio>
+              <tw-radio value="2">选项2</tw-radio>
+              <tw-radio value="3">选项3</tw-radio>
             </tw-radio-group>
-            <span class="text-gray-600">选中值：{{ buttonValue }}</span>
           </div>
-        </div>
-      </section>
-
-      <!-- 边框样式 -->
-      <section>
-        <h2 class="text-2xl font-semibold mb-4">边框样式</h2>
-        <div class="space-y-4">
-          <div class="flex items-center gap-4">
-            <tw-radio-group v-model="borderValue" border>
-              <tw-radio label="1">选项1</tw-radio>
-              <tw-radio label="2">选项2</tw-radio>
-              <tw-radio label="3">选项3</tw-radio>
+          
+          <div>
+            <h3 class="text-lg font-medium mb-2">尺寸</h3>
+            <div class="space-y-2">
+              <div>
+                <tw-radio-group v-model="radioButtonSize" button size="small">
+                  <tw-radio value="small1">小尺寸1</tw-radio>
+                  <tw-radio value="small2">小尺寸2</tw-radio>
+                  <tw-radio value="small3">小尺寸3</tw-radio>
+                </tw-radio-group>
+              </div>
+              <div>
+                <tw-radio-group v-model="radioButtonSize" button>
+                  <tw-radio value="default1">默认1</tw-radio>
+                  <tw-radio value="default2">默认2</tw-radio>
+                  <tw-radio value="default3">默认3</tw-radio>
+                </tw-radio-group>
+              </div>
+              <div>
+                <tw-radio-group v-model="radioButtonSize" button size="large">
+                  <tw-radio value="large1">大尺寸1</tw-radio>
+                  <tw-radio value="large2">大尺寸2</tw-radio>
+                  <tw-radio value="large3">大尺寸3</tw-radio>
+                </tw-radio-group>
+              </div>
+            </div>
+          </div>
+          
+          <div>
+            <h3 class="text-lg font-medium mb-2">禁用</h3>
+            <tw-radio-group v-model="radioButtonDisabled" button disabled>
+              <tw-radio value="disabled1">禁用1</tw-radio>
+              <tw-radio value="disabled2">禁用2</tw-radio>
+              <tw-radio value="disabled3">禁用3</tw-radio>
             </tw-radio-group>
-            <span class="text-gray-600">选中值：{{ borderValue }}</span>
           </div>
         </div>
       </section>
@@ -109,10 +142,13 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 
-const radioValue = ref('1')
-const groupValue = ref('1')
-const buttonValue = ref('1')
-const borderValue = ref('1')
+const radio = ref('1')
+const radioGroup = ref('1')
+const radioBorder = ref('1')
+const radioSize = ref('2')
+const radioButton = ref('1')
+const radioButtonSize = ref('default2')
+const radioButtonDisabled = ref('disabled1')
 
 const propsColumns = [
   { key: 'name', title: '属性名' },
@@ -129,8 +165,8 @@ const propsData = [
     default: '-'
   },
   {
-    name: 'label',
-    description: '单选框的值',
+    name: 'value',
+    description: '单选框对应的值',
     type: 'string | number | boolean',
     default: '-'
   },
@@ -145,6 +181,18 @@ const propsData = [
     description: '原生 name 属性',
     type: 'string',
     default: '-'
+  },
+  {
+    name: 'border',
+    description: '是否显示边框',
+    type: 'boolean',
+    default: 'false'
+  },
+  {
+    name: 'size',
+    description: '单选框的尺寸',
+    type: "'small' | 'default' | 'large'",
+    default: 'default'
   }
 ]
 
@@ -188,10 +236,22 @@ const groupPropsData = [
     default: 'false'
   },
   {
-    name: 'name',
-    description: '原生 name 属性',
-    type: 'string',
-    default: '-'
+    name: 'button',
+    description: '是否使用按钮样式',
+    type: 'boolean',
+    default: 'false'
+  },
+  {
+    name: 'border',
+    description: '是否显示边框',
+    type: 'boolean',
+    default: 'false'
+  },
+  {
+    name: 'size',
+    description: '单选框的尺寸',
+    type: "'small' | 'default' | 'large'",
+    default: 'default'
   }
 ]
 </script>

@@ -28,8 +28,21 @@
         ]"
         @click="!tab.disabled && handleTabClick(tab.name)"
       >
+        <!-- 竖线指示器 -->
+        <span 
+          v-if="type === 'line' && modelValue === tab.name" 
+          class="tw-tabs-vertical-bar"
+        ></span>
+        
         <slot name="tab" :tab="tab">
           <span class="tw-tabs-tab-label">{{ tab.label }}</span>
+          <span 
+            v-if="tab.closable" 
+            class="tw-tabs-tab-close"
+            @click.stop="handleTabClose(tab.name)"
+          >
+            <Icon icon="mdi:close" />
+          </span>
         </slot>
       </div>
       
@@ -50,11 +63,13 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick, useSlots, provide } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface TabItem {
   name: string | number
   label: string
   disabled?: boolean
+  closable?: boolean
 }
 
 interface TabsProps {
@@ -64,6 +79,7 @@ interface TabsProps {
   position?: 'top' | 'bottom' | 'left' | 'right'
   size?: 'small' | 'default' | 'large'
   stretch?: boolean
+  beforeClose?: (name: string | number) => boolean | Promise<boolean>
 }
 
 const props = withDefaults(defineProps<TabsProps>(), {
@@ -78,6 +94,7 @@ const emit = defineEmits<{
   (e: 'update:modelValue', value: string | number): void
   (e: 'tab-click', name: string | number): void
   (e: 'tab-change', name: string | number): void
+  (e: 'tab-close', name: string | number): void
 }>()
 
 const slots = useSlots()
@@ -110,7 +127,8 @@ const tabList = computed(() => {
       return {
         name: props.name,
         label: props.label,
-        disabled: props.disabled
+        disabled: props.disabled,
+        closable: props.closable
       }
     })
   }
@@ -148,6 +166,26 @@ const handleTabClick = (name: string | number) => {
   if (props.modelValue !== name) {
     emit('update:modelValue', name)
     emit('tab-change', name)
+  }
+}
+
+// 处理标签关闭
+const handleTabClose = async (name: string | number) => {
+  if (props.beforeClose) {
+    const canClose = await props.beforeClose(name)
+    if (!canClose) return
+  }
+  
+  emit('tab-close', name)
+  
+  // 如果关闭的是当前活动的标签页，需要选择下一个标签页
+  if (props.modelValue === name) {
+    const index = tabList.value.findIndex(tab => tab.name === name)
+    const nextTab = tabList.value[index + 1] || tabList.value[index - 1]
+    if (nextTab) {
+      emit('update:modelValue', nextTab.name)
+      emit('tab-change', nextTab.name)
+    }
   }
 }
 
@@ -208,7 +246,7 @@ defineOptions({
 
 /* 标签项 */
 .tw-tabs-tab {
-  @apply tw-cursor-pointer tw-transition-all tw-duration-200;
+  @apply tw-cursor-pointer tw-transition-all tw-duration-200 tw-relative;
 }
 
 .tw-tabs-small .tw-tabs-tab {
@@ -273,7 +311,7 @@ defineOptions({
 .tw-tabs-card .tw-tabs-tab-active {
   @apply tw-bg-white tw-border-b-white tw-text-blue-600;
   @apply hover:tw-bg-white hover:tw-text-blue-700;
-  margin-bottom: -1px;
+
 }
 
 .tw-tabs-card .tw-tabs-content {
@@ -315,5 +353,48 @@ defineOptions({
 
 .tw-tabs-tab-active {
   @apply tw-transform tw-scale-100;
+}
+
+/* 关闭按钮 */
+.tw-tabs-tab-close {
+  @apply tw-inline-flex tw-items-center tw-justify-center tw-ml-1 tw-w-4 tw-h-4 tw-rounded-full;
+  @apply tw-text-gray-400 hover:tw-text-gray-600 hover:tw-bg-gray-100;
+}
+
+/* 竖线指示器 */
+.tw-tabs-vertical-bar {
+  @apply tw-absolute   tw-transition-all tw-duration-300 tw-rounded-sm;
+}
+
+.tw-tabs-nav-top .tw-tabs-vertical-bar {
+  @apply tw-left-0 tw-top-0 tw-h-full;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.tw-tabs-nav-bottom .tw-tabs-vertical-bar {
+  @apply tw-left-0 tw-bottom-0 tw-h-full;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  bottom: 0;
+}
+
+.tw-tabs-nav-left .tw-tabs-vertical-bar {
+  @apply tw-left-0 tw-top-0 tw-h-full;
+  position: absolute;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.tw-tabs-nav-right .tw-tabs-vertical-bar {
+  @apply tw-right-0 tw-top-0 tw-h-full;
+  position: absolute;
+  height: 100%;
+  right: 0;
+  top: 0;
 }
 </style> 

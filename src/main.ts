@@ -13,7 +13,9 @@ import Dialog from './components/ui/Dialog.vue'
 import Tabs from './components/ui/Tabs.vue'
 import TabPane from './components/ui/TabPane.vue'
 import Radio from './components/ui/Radio.vue'
+import RadioGroup from './components/ui/RadioGroup.vue'
 import Checkbox from './components/ui/Checkbox.vue'
+import CheckboxGroup from './components/ui/CheckboxGroup.vue'
 import Table from './components/ui/Table.vue'
 
 // 创建应用实例
@@ -29,7 +31,9 @@ app.component('tw-dialog', Dialog)
 app.component('tw-tabs', Tabs)
 app.component('tw-tab-pane', TabPane)
 app.component('tw-radio', Radio)
+app.component('tw-radio-group', RadioGroup)
 app.component('tw-checkbox', Checkbox)
+app.component('tw-checkbox-group', CheckboxGroup)
 app.component('tw-table', Table)
 // 使用路由
 app.use(router)
