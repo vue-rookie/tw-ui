@@ -27,17 +27,14 @@
             <div class="tw-dialog-title">
               <slot name="title">{{ title }}</slot>
             </div>
-            <button 
+            <span 
               v-if="showClose" 
-              type="button" 
               class="tw-dialog-close" 
               @click="close"
               aria-label="关闭"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" class="tw-h-5 tw-w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+              <Icon icon="mdi:close" class="tw-h-5 tw-w-5" />
+            </span>
           </div>
           
           <!-- 内容区 -->
@@ -48,30 +45,25 @@
           <!-- 底部按钮区 -->
           <div v-if="$slots.footer || showFooter" class="tw-dialog-footer">
             <slot name="footer">
-              <button 
-                v-if="showCancel" 
-                type="button" 
-                class="tw-px-4 tw-py-2 tw-bg-white tw-text-gray-700 tw-border tw-border-gray-300 tw-rounded-md tw-shadow-sm hover:tw-bg-gray-50 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-ring-offset-2"
-                @click="handleCancel"
-              >
-                {{ cancelText }}
-              </button>
-              <button 
-                v-if="showConfirm" 
-                type="button" 
-                class="tw-ml-3 tw-px-4 tw-py-2 tw-bg-blue-500 tw-text-white tw-rounded-md tw-shadow-sm hover:tw-bg-blue-600 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-ring-offset-2"
-                :disabled="confirmLoading"
-                @click="handleConfirm"
-              >
-                <span v-if="confirmLoading" class="tw-flex tw-items-center">
-                  <svg class="tw-animate-spin tw-h-4 tw-w-4 tw-mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="tw-opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="tw-opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {{ loadingText }}
-                </span>
-                <span v-else>{{ confirmText }}</span>
-              </button>
+              <div class="tw-flex tw-justify-end tw-gap-2">
+                <tw-button 
+                  v-if="showCancelButton" 
+                  :type="cancelButtonType" 
+                  :size="buttonSize"
+                  @click="handleCancel"
+                >
+                  {{ cancelButtonText }}
+                </tw-button>
+                <tw-button 
+                  v-if="showConfirmButton" 
+                  :type="confirmButtonType" 
+                  :size="buttonSize"
+                  :loading="confirmLoading"
+                  @click="handleConfirm"
+                >
+                  {{ confirmButtonText }}
+                </tw-button>
+              </div>
             </slot>
           </div>
         </div>
@@ -82,6 +74,7 @@
 
 <script setup lang="ts">
 import { ref, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import { Icon } from '@iconify/vue'
 
 interface DialogProps {
   modelValue: boolean
@@ -378,7 +371,8 @@ defineExpose({
 }
 
 .tw-dialog-close {
-  @apply tw-p-1.5 tw-rounded-full tw-text-gray-400 hover:tw-text-gray-500 hover:tw-bg-gray-100 focus:tw-outline-none focus:tw-ring-2 focus:tw-ring-blue-500 focus:tw-ring-offset-2 tw-transition-colors;
+  @apply tw-flex tw-items-center tw-justify-center tw-p-1 tw-rounded-full;
+  @apply hover:tw-bg-gray-100 tw-transition-colors tw-duration-200;
 }
 
 .tw-dialog-body {

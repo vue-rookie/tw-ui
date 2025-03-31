@@ -25,7 +25,10 @@
         @focus="handleFocus"
         @blur="handleBlur"
       />
-      <span class="tw-checkbox-inner"></span>
+      <span class="tw-checkbox-inner">
+        <Icon v-if="modelValue && !indeterminate" icon="mdi:check" class="tw-checkbox-icon" />
+        <Icon v-if="indeterminate" icon="mdi:minus" class="tw-checkbox-icon" />
+      </span>
     </span>
     <span v-if="$slots.default" class="tw-checkbox-label">
       <slot></slot>
@@ -34,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 interface CheckboxProps {
   modelValue: boolean
   disabled?: boolean
@@ -105,33 +110,18 @@ const handleBlur = (event: FocusEvent) => {
   @apply tw-transition-colors tw-duration-200;
 }
 
+.tw-checkbox-icon {
+  @apply tw-w-4 tw-h-4 tw-text-white;
+}
+
 /* 选中状态 */
 .tw-checkbox-checked {
   @apply tw-border-blue-500 tw-bg-blue-500;
 }
 
-.tw-checkbox-checked .tw-checkbox-inner::after {
-  content: '';
-  @apply tw-absolute tw-top-1/2 tw-left-1/2;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: translate(-50%, -60%) rotate(45deg);
-}
-
 /* 半选状态 */
 .tw-checkbox-indeterminate {
   @apply tw-border-blue-500 tw-bg-blue-500;
-}
-
-.tw-checkbox-indeterminate .tw-checkbox-inner::after {
-  content: '';
-  @apply tw-absolute tw-top-1/2 tw-left-1/2;
-  width: 10px;
-  height: 2px;
-  background-color: white;
-  transform: translate(-50%, -50%);
 }
 
 /* 禁用状态 */

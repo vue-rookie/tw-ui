@@ -24,7 +24,9 @@
         @focus="handleFocus"
         @blur="handleBlur"
       />
-      <span class="tw-radio-inner"></span>
+      <span class="tw-radio-inner">
+        <Icon v-if="modelValue === value" icon="mdi:radiobox-marked" class="tw-radio-icon" />
+      </span>
     </span>
     <span v-if="$slots.default" class="tw-radio-label">
       <slot></slot>
@@ -33,6 +35,8 @@
 </template>
 
 <script setup lang="ts">
+import { Icon } from '@iconify/vue'
+
 interface RadioProps {
   modelValue: string | number | boolean
   value: string | number | boolean
@@ -144,5 +148,27 @@ const handleBlur = (event: FocusEvent) => {
 /* 点击动画 */
 .tw-radio-input:active + .tw-radio-inner {
   transform: scale(0.9);
+}
+
+.tw-radio-icon {
+  @apply tw-w-4 tw-h-4 tw-text-blue-500;
+}
+
+/* 选中状态 */
+.tw-radio-checked {
+  @apply tw-border-blue-500;
+}
+
+/* 禁用状态 */
+.tw-radio-disabled {
+  @apply tw-bg-gray-100 tw-border-gray-200;
+}
+
+.tw-radio-disabled .tw-radio-input {
+  @apply tw-cursor-not-allowed;
+}
+
+.tw-radio-disabled.tw-radio-checked .tw-radio-icon {
+  @apply tw-text-blue-300;
 }
 </style> 
